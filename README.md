@@ -80,3 +80,61 @@ For every estimator and scenario, the following metrics were computed:
 ## Results
 
 The simulation produced several consistent findings.
+
+1. The MLE consistenly underestimated the true population size because of its downward bias.
+2. The MoM estimator was approximately unbiased but exhibited substantially greater variability.
+3. The UMVUE consistently achieved the lowest MSE by balancing bias and variance.
+
+These differences were most pronounced when only a small number of serial numbers were observed.
+
+## Visualizations
+
+The repository includes:
+
+- Comparison of mean squared error across simulation scenarios
+- Boxplots illustrating the sampling distributions of each estimator
+- Summary tables reporting empirical bias, variance, and MSE
+
+## Application
+
+The observed serial numbers
+
+43, 86, 171, 36, 177, 222
+
+produce the following estimates:
+
+| Estimator | Estimate |
+| --------- | -------- |
+| MLE       | 222      |
+| MoM       | 244      |
+| UMVUE     | 258      |
+
+Based on the simulation study, the UMVUE provides the most reliable estimate as it consistently exhibits the lowest mean squared error.
+
+## Skills Demonstrated
+
+- R Programming
+- Statistical inference
+- Bias-variance analysis
+- Monte Carlo simulation
+- Estimation theory
+- Data visualization (ggplot2)
+- Statistical computing
+
+## Packages Used
+
+library(tidyverse)
+library(ggplot2)
+library(knitr)
+library(kableExtra)
+
+## Possible Extensions
+
+Potential future extensions include:
+
+- Bayesian estimation using informative and noninformative priors
+- Analytical derivation of estimator variance
+- Bootstrap confidence intervals for each estimator
+- Comparison with additional unbiased estimators
+- Visualization of estimator performance as sample size changes
+
