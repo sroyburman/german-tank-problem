@@ -1,0 +1,214 @@
+---
+title: "The German Tank Problem"
+author: "Sage Roy-Burman"
+format: html
+---
+
+**Introduction:**
+
+During World War II, Allied forces attempted to estimate the total number 
+of German tanks produced in order to gain an edge. One of the methods used 
+relied on statistical inference using known serial numbers on captured 
+tanks. The German tank problem centers on estimating the unknown upper 
+bound of the set {1, 2, 3, ... , N}, assuming serial numbers are drawn 
+uniformly at random without replacement. This upper bound gives crucial 
+information on total tank production. Given a sample of six observed 
+serial numbers (43, 86, 171, 36, 177, 222), our goal is to construct three 
+different estimators for N, and determine which is the most effective.
+
+**Estimators:**
+
+I decided to compare three estimators: the method of moments estimator 
+(MOM), the maximum likelihood estimator (MLE), and the bias corrected MLE, 
+which is also the uniformly minimum-variance unbiased estimator (UMVUE). I 
+selected the MOM estimator as it is relatively easy to calculate, and is 
+also unbiased. I chose the MLE because of its consistency, since as n -\> 
+infinity, the MLE converges to the true value. In this scenario, the MLE 
+is very intuitive, since it is the largest serial number observed. 
+However, since the MLE is downward biased, I also included the UMVUE by 
+correcting the MLE for bias. The UMVUE is a very strong contender, since 
+it has the lowest variance of all unbiased estimators. My derivations and 
+values for these three estimators are attached at the end of this letter.
+
+**Simulation Study Design**
+
+To compare these three estimators, I conducted a simulation study in which 
+samples were repeatedly drawn without replacement from the set {1, 2, 3, 
+... , N}. For each configuration of parameters, I repeated this sampling 
+process 5,000 times, calculating the MOM estimator, MLE, and UMVUE for 
+every simulated dataset. To look at estimator performance across diverse 
+settings, I used four different scenarios combining large and small values 
+of N and n. Specifically, I considered N = 250, n = 6; N = 2000, n = 6; N 
+= 250, n = 30; and N = 2000, n = 30. This mix of limited and informed 
+sampling conditions allows for better comparison of estimator behavior. 
+For each estimator and scenario, I computed four performance metrics: the 
+mean estimate across simulations, the bias, the standard deviation, and 
+the mean squared error.
+
+**Simulation Study Results**
+
+```{r, include = FALSE}
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+# Load necessary packages
+```
+
+```{r, echo = FALSE}
+single_trial <- function(N, n) {
+  x <- sample(1:N, n, FALSE)
+  xbar <- mean(x)
+  xmax <- max(x)
+  c(
+    MLE = xmax,
+    MOM = 2*xbar - 1,
+    UMVUE = ((n + 1)/n) * xmax - 1
+  )
+}
+# This function performs a single simulation of the problem, calculating 
+# the three estimators for the one sim.
+```
+
+```{r, echo = FALSE}
+run_sim <- function(N, n, R = 5000) {
+  sims <- replicate(R, single_trial(N, n))
+  sims <- t(sims)
+  
+  data.frame(
+    Estimator = colnames(sims),
+    Mean = colMeans(sims),
+    Bias = colMeans(sims) - N,
+    SD = apply(sims, 2, sd),
+    MSE = colMeans((sims-N)^2)
+  )
+}
+# This function runs the simulation study for a given population size and 
+# sample size. It repeats the sampling process 5,000 times, computes each 
+# estimator for each simulated dataset, and calculates mean, bias, SD, and MSE.
+```
+
+```{r, echo = FALSE}
+small_N_small_n <- run_sim(250, 6)
+large_N_small_n <- run_sim(2000, 6)
+small_N_large_n <- run_sim(250, 30)
+large_N_large_n <- run_sim(2000, 30)
+# This block applies the simulation function to the four scenarios.
+```
+
+```{r, echo = FALSE}
+all_results <- bind_rows(
+  small_N_small_n,
+  large_N_small_n,
+  small_N_large_n,
+  large_N_large_n
+) %>%
+  select(Estimator, Mean, Bias, SD, MSE)
+
+kable(all_results, digits = 2, row.names = FALSE,
+      caption = "Mean, bias, empirical standard deviation, and MSE for each estimator") %>%
+  kable_styling(full_width = FALSE, position = "center") %>%
+  pack_rows("N = 250, n = 6", 1, 3) %>%
+  pack_rows("N = 2000, n = 6", 4, 6) %>%
+  pack_rows("N = 250, n = 30", 7, 9) %>%
+  pack_rows("N = 2000, n = 30", 10, 12)
+# This table summarizes the performance of each estimator across scenarios.
+```
+
+The simulation results reveal many clear estimator patterns across all 
+scenarios. First, the MLE exhibits downward bias in every setting. 
+Although the variability of the MLE is low (from the standard deviation), 
+the MSE is consistently relatively large. For the MOM estimator, the bias 
+is extremely low, as the estimator itself is unbiased. However, it has the 
+highest standard deviation, and therefore variability, of all estimators 
+in all scenarios, resulting in a very high MSE. Overall, the UMVUE 
+performs the best of all estimators, which is unsurprising. Its 
+combination of low variability and lack of bias results in the lowest MSE 
+over all settings. These effects are even more prominent when the sample 
+size is lower, as bias and variability are more pronounced.
+
+```{r, echo = FALSE}
+library(ggplot2)
+
+ggplot(bind_rows(
+  mutate(small_N_small_n, Scenario = "N = 250, n = 6"),
+  mutate(large_N_small_n, Scenario = "N = 2000, n = 6"),
+  mutate(small_N_large_n, Scenario = "N = 250, n = 30"),
+  mutate(large_N_large_n, Scenario = "N = 2000, n = 30")
+), aes(x = Estimator, y = MSE)) +
+  geom_col() +
+  facet_wrap(~Scenario, scales = "free_y") +
+  labs(
+    title = "Mean Squared Error of Different Estimators",
+    x = "Estimator",
+    y = "MSE"
+  )
+# This code plots the MSE of different estimators across scenarios
+```
+
+**Figure 1: MSE of Different Estimators Across Scenarios** shows that the 
+UMVUE consistently has the lowest MSE, with the MLE following and the MOM 
+estimator having consistently large MSE.
+
+```{r, echo = FALSE}
+library(tidyverse)
+
+sim_data <- replicate(5000, single_trial(n = 6, N = 250))
+sim_data <- t(sim_data)
+sim_data <- as.data.frame(sim_data)
+
+sim_data_long <- sim_data %>%
+  pivot_longer(cols = everything(),
+               names_to = "Estimator",
+               values_to = "Estimate")
+# This code generates 5,000 simulated samples for a fixed scenario, and 
+# computes the three estimators for each sample. It is then reshaped into 
+# long format, where each row corresponds to a single estimate and its 
+# associated estimator. This format is used for easier vizualization.
+```
+
+```{r, echo = FALSE}
+ggplot(sim_data_long, aes(x = Estimator, y = Estimate, fill = Estimator)) +
+  geom_boxplot(alpha = 0.7) +
+  geom_hline(yintercept = 250, color = "red", linetype = "dashed") +
+  labs(
+    title = "Distribution of Estimators for N (N = 250, n = 6)",
+    y = "Estimated N"
+  )
+# This plot shows the distribution of estimators across simulated samples for a specific scenario.
+```
+
+**Figure 2: Distribution of Estimators for N = 250, n = 6** illustrates 
+how the MOM estimator shows extreme variability, whereas the MLE and UMVUE 
+have a tighter spread. Additionally, the downward bias of the MLE is 
+apparent, and the MOM and UMVUE appear unbiased.
+
+**Application to Observed Data**
+
+Using the observed serial numbers, {43, 86, 171, 36, 177, 222}, we are 
+able to calculate the three estimators. 
+$$
+\hat{N}_{\text{MLE}} = 222
+$$
+
+$$
+\hat{N}_{\text{MOM}} = 244
+$$
+
+$$
+\hat{N}_{\text{UMVUE}} = 258
+$$
+
+Since our simulation results showed the UMVUE performed better in terms of 
+bias and mean squared error, we should prefer the UMVUE estimate.
+
+**Conclusion**
+
+The German tank problem highlights the importance of the balance between 
+bias and variance in selecting the proper estimator. For the maximum 
+likelihood estimator, it exhibited low variance, but its downward bias 
+resulted in consistent underestimation in the simulations. The method of 
+moments estimator is unbiased, but had extremely high variability. The 
+UMVUE combines the strengths of both, giving low bias while also limiting 
+variance. As a result of the simulation evidence, the UMVUE is the clear 
+preferred estimator. Using the UMVUE, I approximate that N = 258 tanks 
+were produced.
