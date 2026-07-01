@@ -52,3 +52,31 @@ Characteristics:
 - Lowest mean squared error across all simulated scenarios
 
 ## Simulation Design
+
+Estimator performance was evaluated using Monte Carlo simulation.
+
+For each simulation:
+
+1. A simple random sample was drawn without replacement
+2. All three estimators were computed
+3. The process was repeated 5,000 times
+
+Four parameter settings were considered:
+
+| Population Size (N) | Sample Size (n) |
+|---------------------|-----------------|
+| 250                 | 6               |
+| 2000                | 6               |
+| 250                 | 30              |
+| 2000                | 30              |
+
+For every estimator and scenario, the following metrics were computed:
+
+- Mean estimate
+- Bias
+- Standard deviation
+- Mean squared error (MSE)
+
+## Results
+
+The simulation produced several consistent findings.
