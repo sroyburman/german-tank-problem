@@ -39,7 +39,7 @@ run_sim <- function(N, n, R = 5000) {
     Estimator = colnames(sims),
     Mean = colMeans(sims),
     Bias = colMeans(sims) - N,
-    SD = apply(sims, 2, sd), # Looked up what code calculates SD in matrices
+    SD = apply(sims, 2, sd),
     MSE = colMeans((sims-N)^2)
   )
 }
