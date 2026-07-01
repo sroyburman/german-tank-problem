@@ -2,7 +2,6 @@
 title: "The German Tank Problem"
 author: "Sage Roy-Burman"
 format: html
-editor: visual
 ---
 
 ```{r}
