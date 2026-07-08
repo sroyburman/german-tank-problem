@@ -123,10 +123,10 @@ Based on the simulation study, the UMVUE provides the most reliable estimate as 
 
 ## Packages Used
 
-library(tidyverse)
-library(ggplot2)
-library(knitr)
-library(kableExtra)
+`library(tidyverse)`;
+`library(ggplot2)`;
+`library(knitr)`;
+`library(kableExtra)`
 
 ## Possible Extensions
 
