@@ -27,8 +27,7 @@ infinity, the MLE converges to the true value. In this scenario, the MLE
 is very intuitive, since it is the largest serial number observed. 
 However, since the MLE is downward biased, I also included the UMVUE by 
 correcting the MLE for bias. The UMVUE is a very strong contender, since 
-it has the lowest variance of all unbiased estimators. My derivations and 
-values for these three estimators are attached at the end of this letter.
+it has the lowest variance of all unbiased estimators.
 
 **Simulation Study Design**
 
