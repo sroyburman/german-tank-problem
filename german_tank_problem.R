@@ -4,16 +4,14 @@ author: "Sage Roy-Burman"
 format: html
 ---
 
-```{r}
+
 library(tidyverse)
 library(knitr)
 library(kableExtra)
 
 # Load necessary packages
 
-```
 
-```{r}
 single_trial <- function(N, n) {
   x <- sample(1:N, n, FALSE)
   xbar <- mean(x)
@@ -24,12 +22,11 @@ single_trial <- function(N, n) {
     UMVUE = ((n + 1)/n) * xmax - 1
   )
 }
-
 # This function performs a single simulation of the problem, calculating the three estimators for the one sim.
 
-```
 
-```{r}
+
+
 run_sim <- function(N, n, R = 5000) {
   sims <- replicate(R, single_trial(N, n))
   sims <- t(sims)
@@ -42,13 +39,11 @@ run_sim <- function(N, n, R = 5000) {
     MSE = colMeans((sims-N)^2)
   )
 }
-
 # This function runs the simulation study for a given population size and sample size. It repeats the sampling process 5,000 times, 
 # computes each estimator for each simulated dataset, and calculates mean, bias, SD, and MSE.
 
-```
 
-```{r}
+
 small_N_small_n <- run_sim(250, 6)
 large_N_small_n <- run_sim(2000, 6)
 small_N_large_n <- run_sim(250, 30)
@@ -56,9 +51,8 @@ large_N_large_n <- run_sim(2000, 30)
 
 # This block applies the simulation function to the four scenarios.
 
-```
 
-```{r}
+
 all_results <- bind_rows(
   small_N_small_n,
   large_N_small_n,
@@ -77,9 +71,8 @@ kable(all_results, digits = 2, row.names = FALSE,
 
 # This table summarizes the performance of each estimator across scenarios.
 
-```
 
-```{r, echo = FALSE}
+
 library(ggplot2)
 
 ggplot(bind_rows(
@@ -98,9 +91,8 @@ ggplot(bind_rows(
 
 # This code plots the MSE of different estimators across scenarios
 
-```
 
-```{r}
+
 library(tidyverse)
 
 sim_data <- replicate(5000, single_trial(n = 6, N = 250))
@@ -116,9 +108,8 @@ sim_data_long <- sim_data %>%
 # It is then reshaped into long format, where each row corresponds to a single estimate and its associated estimator. 
 # This format is used for easier vizualization.
 
-```
 
-```{r, echo = FALSE}
+
 ggplot(sim_data_long, aes(x = Estimator, y = Estimate, fill = Estimator)) +
   geom_boxplot(alpha = 0.7) +
   geom_hline(yintercept = 250, color = "red", linetype = "dashed") +
@@ -129,4 +120,3 @@ ggplot(sim_data_long, aes(x = Estimator, y = Estimate, fill = Estimator)) +
 
 # This plot shows the distribution of estimators across simulated samples for a specific scenario.
 
-```
